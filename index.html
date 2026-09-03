@@ -171,6 +171,7 @@
   .advice-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;letter-spacing:.15em;color:#8a6f3d;margin-bottom:12px}
   .advice-title::before{content:"";width:7px;height:7px;border-radius:2px;background:#c89a3a;transform:rotate(45deg)}
   .advice-desc{font-size:15px;line-height:1.8;color:#3a3530}
+  .advice-call{font-size:16px;font-weight:700;line-height:1.65;color:#1f1d18;margin-bottom:12px;padding:10px 12px;background:rgba(200,154,58,.08);border-radius:8px;border-left:3px solid #c89a3a}
   .rc-subattr{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:rgba(0,0,0,.025);padding:10px 12px;border-radius:8px;border-left:3px solid #c89a3a}
   .rc-tie{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:#f4f0ff;padding:10px 12px;border-radius:8px;border-left:3px solid #8a7fc8}
   .rc-three{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:#f0f6ff;padding:10px 12px;border-radius:8px;border-left:3px solid #6f9ed4}
@@ -498,6 +499,28 @@ const DISCLAIMER = '※ 本结果仅供自我了解与参考，不作为面试�
 const TIE_TWO   = '你身上同时带着 {A} 和 {B} 的影子，两边都能站得住——面试时可以把两边都聊一聊。';
 const TIE_THREE = '三项都挺接近，没有哪个明显占头——你的兴趣比单选宽。';
 
+/* 面试建议语句（结果页 HTML 高亮版 + 复制纯文本版） */
+const DEPT_COLORS = {P:'#3a6db8', X:'#c54a6a', Z:'#2f9d6e'};
+function adviceLine(r){
+  if (r.tieKind === 'three'){
+    return { text:'建议三个部门都去面试聊聊，再做决定。', html:'建议三个部门都去面试聊聊，再做决定。' };
+  }
+  const topName = DEPTS[r.top1].name;
+  const topColor = DEPT_COLORS[r.top1];
+  if (r.tieKind === 'two'){
+    const name2 = DEPTS[r.top2].name;
+    const color2 = DEPT_COLORS[r.top2];
+    return {
+      text: `建议优先面试「${topName}」或「${name2}」，两边都聊一聊。`,
+      html: `建议优先面试 <span style="color:${topColor}">「${topName}」</span> 或 <span style="color:${color2}">「${name2}」</span>，两边都聊一聊。`
+    };
+  }
+  return {
+    text: `建议优先面试「${topName}」。`,
+    html: `建议优先面试 <span style="color:${topColor}">「${topName}」</span>。`
+  };
+}
+
 /* ============================================================
    状态与渲染
 ============================================================ */
@@ -658,6 +681,7 @@ function showResult(){
   const advice = `
     <div class="advice-block">
       <div class="advice-title">推荐方向</div>
+      <div class="advice-call">${adviceLine(r).html}</div>
       <div class="advice-desc">${DEPT_DESC[r.top1]}</div>
       ${r.topSub && SUB_DESC[r.topSub] ? `<div class="rc-subattr">${SUB_DESC[r.topSub]}</div>` : ''}
       ${tie}
@@ -725,6 +749,7 @@ function buildCopyText(){
   });
   lines.push('');
   lines.push('—— 推荐方向 ——');
+  lines.push(adviceLine(r).text);
   lines.push(DEPT_DESC[top]);
   if (r.topSub && SUB_DESC[r.topSub]) lines.push(SUB_DESC[r.topSub]);
   if (r.tieKind === 'three')      lines.push(TIE_THREE);
