@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>本命部门测试 · 30 题找到你的方向</title>
+<style>
+  /* ====== reset & base ====== */
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:16px;line-height:1.65;
+    color:#1f1d18;
+    background:#f6f3ec;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  button{font-family:inherit;border:0;background:none;cursor:pointer;color:inherit}
+  h1,h2,h3,h4,p{margin:0}
+
+  /* ====== layout ====== */
+  .app{max-width:680px;margin:0 auto;background:#f6f3ec;min-height:100vh;padding-bottom:40px}
+
+  /* ====== hero ====== */
+  .hero{
+    position:relative;
+    background:
+      radial-gradient(120% 80% at 0% 0%, #fde2c8 0%, transparent 55%),
+      radial-gradient(120% 80% at 100% 0%, #f4cdd4 0%, transparent 55%),
+      linear-gradient(180deg,#fbf6ee 0%,#f6f3ec 100%);
+    padding:40px 24px 28px;
+    border-bottom:1px solid rgba(0,0,0,.04);
+  }
+  .kicker{
+    display:inline-block;
+    font-size:12px;letter-spacing:.2em;
+    color:#8a6f3d;background:rgba(255,255,255,.6);
+    padding:4px 10px;border-radius:999px;
+    border:1px solid rgba(138,111,61,.2);
+    margin-bottom:12px;
+  }
+  .hero h1{font-size:28px;font-weight:700;letter-spacing:.5px;line-height:1.25;margin-bottom:8px}
+  .hero .sub{font-size:14.5px;color:#5a5448;line-height:1.7}
+
+  /* ====== card / quiz ====== */
+  .main{padding:16px}
+  .card{
+    background:#fff;
+    border-radius:18px;
+    padding:22px 20px 24px;
+    box-shadow:0 1px 0 rgba(0,0,0,.02),0 10px 32px -18px rgba(0,0,0,.14);
+    border:1px solid rgba(0,0,0,.04);
+  }
+  .card-sub{
+    text-align:center;color:#8a8275;font-size:13px;
+    margin-bottom:14px;line-height:1.6;
+  }
+  .progress{
+    height:6px;background:#ece6da;border-radius:999px;overflow:hidden;margin-bottom:18px;
+  }
+  .progress > i{
+    display:block;height:100%;width:0%;
+    background:linear-gradient(90deg,#1f1d18 0%,#6b5b3d 100%);
+    border-radius:999px;transition:width .3s ease;
+  }
+
+  /* 顶部题号 / 部分标签 */
+  .q-meta{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-bottom:14px;
+  }
+  .q-part{
+    font-size:11px;letter-spacing:.1em;color:#8a6f3d;
+    background:rgba(255,255,255,0);border:1px solid rgba(138,111,61,.25);
+    padding:3px 9px;border-radius:999px;font-weight:600;
+  }
+  .q-count{font-size:13px;color:#8a8275;font-feature-settings:"tnum"}
+
+  .q{display:none}
+  .q.active{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .q-title{
+    font-size:17px;font-weight:600;line-height:1.55;margin-bottom:16px;color:#1f1d18;
+  }
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    display:flex;align-items:flex-start;gap:12px;width:100%;
+    text-align:left;
+    padding:14px 14px;
+    border:1.5px solid #ece6da;
+    border-radius:12px;
+    background:#fbfaf6;
+    color:#1f1d18;
+    transition:border-color .15s, background .15s, transform .05s;
+    cursor:pointer;
+  }
+  .opt:active{transform:scale(.995)}
+  .opt-letter{
+    flex:none;
+    width:24px;height:24px;border-radius:6px;
+    background:#ece6da;color:#5a5448;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;
+    transition:background .15s,color .15s;
+  }
+  .opt-text{flex:1;font-size:15px;line-height:1.55;color:#1f1d18;padding-top:1px}
+  .opt-check{
+    flex:none;
+    width:22px;height:22px;border-radius:50%;
+    border:1.5px solid #d8d0bf;
+    display:inline-flex;align-items:center;justify-content:center;
+    color:transparent;font-size:13px;font-weight:700;
+    transition:all .15s;margin-top:1px;
+  }
+  .opt-check::after{content:"✓"}
+  .opt.sel{background:#fff8e6;border-color:#1f1d18}
+  .opt.sel .opt-letter{background:#1f1d18;color:#fff}
+  .opt.sel .opt-check{background:#1f1d18;border-color:#1f1d18;color:#fff}
+
+  /* 导航 */
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:22px}
+  button.btn{
+    border-radius:11px;padding:13px 22px;font-size:15px;font-weight:600;letter-spacing:.5px;
+    transition:opacity .15s, background .15s, transform .05s;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn-prev{background:#f1ebdf;color:#5a5448;border:1px solid #d8d0bf}
+  .btn-prev.invisible{visibility:hidden}
+  .btn-next{background:#1f1d18;color:#fff;flex:1}
+  .btn-next:disabled{background:#c9c2b3;color:#fff;cursor:not-allowed;opacity:.9}
+
+  /* ====== result ====== */
+  .result-card{
+    background:#fff;border-radius:16px;padding:20px 18px;
+    border:1px solid rgba(0,0,0,.04);
+    box-shadow:0 1px 0 rgba(0,0,0,.02),0 8px 24px -12px rgba(0,0,0,.08);
+    margin:12px 0;
+  }
+  .rc-top{
+    background:linear-gradient(135deg,#fff7e3 0%,#fff 60%);
+    border:1.5px solid #e8c87a;
+    box-shadow:0 1px 0 rgba(0,0,0,.02),0 10px 30px -14px rgba(200,154,58,.35);
+    position:relative;
+  }
+  .crown{
+    position:absolute;top:-12px;left:16px;
+    background:#c89a3a;color:#fff;
+    font-size:12px;font-weight:700;letter-spacing:.5px;
+    padding:4px 10px;border-radius:999px;
+    display:inline-flex;align-items:center;gap:4px;
+    box-shadow:0 4px 10px -2px rgba(200,154,58,.4);
+  }
+  .crown::before{content:"★"}
+  .rc-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+  .rc-name{font-size:18px;font-weight:700;letter-spacing:.5px}
+  .rc-sub{font-size:13px;color:#5a5448;background:rgba(0,0,0,.04);padding:2px 8px;border-radius:6px}
+  .rc-score{margin-left:auto;font-size:28px;font-weight:800;letter-spacing:-.5px;font-feature-settings:"tnum"}
+  .rc-raw{font-size:13px;color:#8a8275;margin-top:2px;font-feature-settings:"tnum"}
+  .rc-bar{height:10px;background:#ece6da;border-radius:999px;overflow:hidden;margin-top:4px}
+  .rc-bar-fill{height:100%;width:0%;border-radius:999px;transition:width 1.1s cubic-bezier(.2,.7,.2,1)}
+  .rc-bar-fill.dP{background:linear-gradient(90deg,#3a6db8 0%,#5a8ad0 100%)}
+  .rc-bar-fill.dX{background:linear-gradient(90deg,#c54a6a 0%,#dd7090 100%)}
+  .rc-bar-fill.dZ{background:linear-gradient(90deg,#2f9d6e 0%,#4cb88c 100%)}
+  .rc-desc{margin-top:16px;padding-top:14px;border-top:1px dashed rgba(0,0,0,.08);font-size:15px;line-height:1.8;color:#3a3530}
+  .rc-subattr{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:rgba(0,0,0,.025);padding:10px 12px;border-radius:8px;border-left:3px solid #c89a3a}
+  .rc-tie{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:#f4f0ff;padding:10px 12px;border-radius:8px;border-left:3px solid #8a7fc8}
+  .rc-three{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:#f0f6ff;padding:10px 12px;border-radius:8px;border-left:3px solid #6f9ed4}
+  .rc-disc{margin-top:14px;font-size:12.5px;color:#8a8275;line-height:1.7;text-align:center}
+  .rc-q31{margin-top:18px;padding-top:14px;border-top:1px dashed rgba(0,0,0,.08)}
+  .rc-q31 label{display:block;font-size:13px;color:#5a5448;margin-bottom:8px}
+  .rc-q31 label .opt-tag{font-size:11px;background:rgba(0,0,0,.05);padding:1px 6px;border-radius:4px;margin-left:6px;color:#8a8275}
+  .rc-q31 select{
+    width:100%;padding:11px 12px;font-size:15px;color:#1f1d18;
+    background:#fbfaf6;border:1.5px solid #ece6da;border-radius:10px;
+    font-family:inherit;-webkit-appearance:none;appearance:none;
+    background-image:linear-gradient(45deg,transparent 50%,#8a8275 50%),linear-gradient(135deg,#8a8275 50%,transparent 50%);
+    background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;
+    background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+  }
+  .rc-actions{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .rc-btn{flex:1;min-width:140px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:600;letter-spacing:.5px;transition:opacity .15s,transform .05s}
+  .rc-btn:active{transform:scale(.98)}
+  .rc-btn-primary{background:#1f1d18;color:#fff}
+  .rc-btn-ghost{background:#f1ebdf;color:#1f1d18;border:1px solid #d8d0bf}
+
+  .result-head{text-align:center;margin-bottom:16px}
+  .result-head h2{font-size:22px;color:#1f1d18;margin-bottom:4px}
+  .result-head .tip{color:#8a8275;font-size:13px}
+
+  .toast{
+    position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.96);
+    background:rgba(31,29,24,.92);color:#fff;padding:12px 22px;border-radius:10px;
+    font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+  .footer-note{text-align:center;color:#8a8275;font-size:12px;margin-top:18px;line-height:1.7}
+
+  /* ====== responsive ====== */
+  @media (max-width:380px){
+    .hero{padding:32px 20px 24px}
+    .hero h1{font-size:25px}
+    .card{padding:18px 16px 20px}
+    .opt-text{font-size:14.5px}
+    .q-title{font-size:16px}
+    .rc-score{font-size:24px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .rc-bar-fill{transition:none}
+    .opt,.btn{transition:none}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="kicker">青志协 · 招新测评</div>
+    <h1>本命部门测试</h1>
+    <p class="sub">30 道落在生活里的小题 · 约 5–6 分钟<br>看看哪个部门最像你</p>
+  </header>
+
+  <main class="main">
+    <div class="card" id="card">
+      <p class="card-sub" id="cardSub">共 30 题 · 完成后显示你与三个部门的适配度</p>
+      <div class="progress" id="progress"><i id="progBar"></i></div>
+
+      <div id="quiz"></div>
+
+      <div class="nav" id="nav">
+        <button class="btn btn-prev invisible" id="prevBtn">上一题</button>
+        <button class="btn btn-next" id="nextBtn" disabled>下一题</button>
+      </div>
+
+      <div id="resultWrap"></div>
+    </div>
+    <p class="footer-note">凭第一反应选，没有对错。选项顺序是特意打乱的，看不出规律。<br>本测试仅供自我了解与参考，不作为面试评判依据。</p>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   题目数据（严格依据 Word 文档《本命部门测试·计分版（内部）》
+   选项顺序保持原样打乱，不可重排）
+   d: 部门 P=项目部 X=宣传部 Z=志愿者部
+   s: 分值 0/1/2
+   sub: 副属性（统筹/策划/视觉/文字/影像/带队/陪伴）
+============================================================ */
+const QUESTIONS = [
+  // PART 1：1-8
+  { p:`手机相册翻到最底下，占比最大的一类是？`,
+    o:[
+      { t:`风景、光影、随手拍的构图，很多张里都没有人`, d:'X', s:2, sub:'视觉' },
+      { t:`和朋友的合照、聚会现场的抓拍`, d:'Z', s:2, sub:'陪伴' },
+      { t:`课表、时间安排、待办、别人发的通知，全是截图`, d:'P', s:2, sub:'统筹' },
+      { t:`表情包、梗图、存着以后备用的沙雕素材`, d:'X', s:1 }
+    ]},
+  { p:`群里刚发出一条通知，你的眼睛第一下落在哪？`,
+    o:[
+      { t:`发的人语气好像有点急，是不是出什么事了`, d:'Z', s:1 },
+      { t:`有没有错别字，断句和排版是不是有点别扭`, d:'X', s:2, sub:'文字' },
+      { t:`后面有几个人回了\u201C收到\u201D，谁大概还没看见`, d:'Z', s:2, sub:'带队' },
+      { t:`时间、地点、要带什么，说清楚了没有`, d:'P', s:2, sub:'统筹' }
+    ]},
+  { p:`你平时记事更接近哪种？`,
+    o:[
+      { t:`基本不记，和人当面对一遍就记住了`, d:'Z', s:2, sub:'陪伴' },
+      { t:`丢进日历里，靠提醒推着走`, d:'P', s:1 },
+      { t:`分层的清单，标了先后，做完打个勾`, d:'P', s:2, sub:'统筹' },
+      { t:`想到就随手记一句，写出来像自己在说话`, d:'X', s:2, sub:'文字' }
+    ]},
+  { p:`一部看完很久的片子，你最先想复述给别人的是？`,
+    o:[
+      { t:`某一个镜头，或者某一句台词`, d:'X', s:2, sub:'影像' },
+      { t:`某个人的处境，你替他难受了很久`, d:'Z', s:2, sub:'陪伴' },
+      { t:`它怎么埋线、怎么收尾，整个结构`, d:'P', s:2, sub:'策划' }
+    ]},
+  { p:`刷到一条播放量很高的内容，你会多停两秒去想？`,
+    o:[
+      { t:`它到底讲了什么，站不站得住`, d:'P', s:2, sub:'策划' },
+      { t:`封面和前三秒是怎么把人留住的`, d:'X', s:2, sub:'视觉' },
+      { t:`评论区里那些人的故事`, d:'Z', s:2, sub:'陪伴' },
+      { t:`没想什么，看完就划走了`, d:'',  s:0 }
+    ]},
+  { p:`五个人一起出门玩，最后是你在做哪件事？`,
+    o:[
+      { t:`车次、住宿、预算、每天几点出发，拉了个表`, d:'P', s:2, sub:'统筹' },
+      { t:`找店、问路、跟老板搭话，顺手盯着谁别掉队`, d:'Z', s:2, sub:'带队' },
+      { t:`一路举着手机记，回来剪成一条片子`, d:'X', s:2, sub:'影像' },
+      { t:`什么都不操心，跟着走就挺好`, d:'Z', s:1 }
+    ]},
+  { p:`你的电脑桌面和文件夹更像哪种？`,
+    o:[
+      { t:`攒一阵子整理一次，中间乱着也无所谓`, d:'P', s:1 },
+      { t:`图片、素材归得很细，别的随便`, d:'X', s:2, sub:'视觉' },
+      { t:`有层级有命名，三个月前的东西也翻得到`, d:'P', s:2, sub:'统筹' },
+      { t:`不太整理，但谁问我要什么，我都能马上从群里翻出来发过去`, d:'Z', s:2, sub:'带队' }
+    ]},
+  { p:`逛完一个展、听完一场活动，隔天还记得的是？`,
+    o:[
+      { t:`主视觉、字体、灯光和配色`, d:'X', s:2, sub:'视觉' },
+      { t:`动线和流程怎么排的，哪一段排队最久`, d:'P', s:2, sub:'统筹' },
+      { t:`台上那个人什么状态，底下什么反应`, d:'Z', s:2, sub:'陪伴' }
+    ]},
+
+  // PART 2：9-17
+  { p:`一件事眼看要开始，关键的人临时说来不了。你脑子里最先转的是？`,
+    o:[
+      { t:`先想还有谁能顶上，或者哪一段可以砍`, d:'P', s:2, sub:'统筹' },
+      { t:`先问清楚他为什么来不了，看还有没有转机`, d:'Z', s:1 },
+      { t:`先想对外怎么讲，别让人觉得是在敷衍`, d:'X', s:2, sub:'文字' },
+      { t:`先跟等着的人说一声，别让大家干等着慌`, d:'Z', s:2, sub:'带队' }
+    ]},
+  { p:`你交上去的东西被要求大改，理由你只认一半。后来回想？`,
+    o:[
+      { t:`改是改了，心里那口气过了好几天`, d:'X', s:1 },
+      { t:`先改完再说，别卡着别人的进度`, d:'Z', s:2, sub:'带队' },
+      { t:`当时不太舒服，但改完确实比原来好看`, d:'X', s:2, sub:'视觉' },
+      { t:`认的那一半我照做，不认的那半我说了我的想法`, d:'P', s:2, sub:'策划' }
+    ]},
+  { p:`朋友深夜跟你说他撑不住了，你更可能？`,
+    o:[
+      { t:`给他写一段很长的话，想把他讲明白`, d:'X', s:2, sub:'文字' },
+      { t:`陪着聊，不急着给建议`, d:'Z', s:2, sub:'陪伴' },
+      { t:`找点别的把他注意力带开，明天再说`, d:'X', s:1 },
+      { t:`帮他把事情理一理，看卡在哪一步`, d:'P', s:2, sub:'策划' }
+    ]},
+  { p:`事情办完了，回头发现出了岔子。你最先自责的是？`,
+    o:[
+      { t:`有个人一直没人管，我当时应该看见的`, d:'Z', s:2, sub:'陪伴' },
+      { t:`这个点我其实早该想到，没提前拦住`, d:'P', s:2, sub:'策划' },
+      { t:`我明明说了，但没说清楚，别人没听懂`, d:'X', s:2, sub:'文字' }
+    ]},
+  { p:`十个人的时间要凑在一起，你会？`,
+    o:[
+      { t:`发个表让大家填，自己排出重合的时段`, d:'P', s:2, sub:'统筹' },
+      { t:`在群里吼一声，等大家自己报`, d:'Z', s:1 },
+      { t:`一个一个私聊问，顺便听听谁有难处`, d:'Z', s:2, sub:'带队' },
+      { t:`把可选的方案写清楚发出去，让大家好选`, d:'X', s:2, sub:'文字' }
+    ]},
+  { p:`你提醒过一件事有风险，但没人当回事，后来果然出了。你？`,
+    o:[
+      { t:`补一句\u201C下次这块得定个规矩\u201D，然后去补锅`, d:'P', s:2, sub:'策划' },
+      { t:`先不说话，把眼前的场面收拾好`, d:'Z', s:2, sub:'带队' },
+      { t:`想办法把这事说出来，但得说得让人听进去，不像在指责`, d:'X', s:2, sub:'文字' },
+      { t:`挺想把当时的原话截图发出来`, d:'X', s:1 }
+    ]},
+  { p:`一个全是陌生人的场合，进门半小时后你在？`,
+    o:[
+      { t:`盘算什么时候能走`, d:'X', s:1 },
+      { t:`找到一个明确能干的活，先干着`, d:'P', s:2, sub:'统筹' },
+      { t:`已经和旁边两三个人聊上了`, d:'Z', s:2, sub:'陪伴' },
+      { t:`靠边站着看，心里给每个人贴了标签`, d:'X', s:2, sub:'视觉' }
+    ]},
+  { p:`刚进一个新群，第一天你在干什么？`,
+    o:[
+      { t:`找个话头插一句，先把自己变成活人`, d:'Z', s:2, sub:'陪伴' },
+      { t:`往上翻消息，把这群是干什么的搞清楚`, d:'P', s:2, sub:'策划' },
+      { t:`先不出声，等有人叫我`, d:'Z', s:1 },
+      { t:`看头像、看昵称、看谁说话什么调，猜都是些什么人`, d:'X', s:2, sub:'视觉' }
+    ]},
+  { p:`同一件事，你跟老师讲和跟同学讲，说法会差多少？`,
+    o:[
+      { t:`看对方什么反应临时调，讲到他听懂为止`, d:'Z', s:2, sub:'带队' },
+      { t:`差挺多，用词和语气我会整个换一遍`, d:'X', s:2, sub:'文字' },
+      { t:`差不多，重点我不会变`, d:'P', s:1 },
+      { t:`我会先想清楚他最想知道哪一句，就从那句开始`, d:'P', s:2, sub:'策划' }
+    ]},
+
+  // PART 3：18-24
+  { p:`哪种\u201C没意思\u201D，你能坚持最久？`,
+    o:[
+      { t:`为了一点视觉上的差别，同一个东西挪二十遍`, d:'X', s:2, sub:'视觉' },
+      { t:`把一堆零散的信息，一条一条核对成一张表`, d:'P', s:2, sub:'统筹' },
+      { t:`同一句话跟三十个人分别说一遍，还得都有耐心`, d:'Z', s:2, sub:'带队' }
+    ]},
+  { p:`一件事做了很久，还看不出效果，你的状态是？`,
+    o:[
+      { t:`只要还有人需要我在，我就还在`, d:'Z', s:2, sub:'陪伴' },
+      { t:`得让我看见点动静，哪怕是别人一句反馈`, d:'X', s:2, sub:'影像' },
+      { t:`会掉劲，得有人拉我一把`, d:'Z', s:1 },
+      { t:`能等，我知道这种事本来就慢`, d:'P', s:2, sub:'策划' }
+    ]},
+  { p:`下面哪句夸你，你最开心？`,
+    o:[
+      { t:`\u201C有你在场的时候，大家都松弛。\u201D`, d:'Z', s:2, sub:'陪伴' },
+      { t:`\u201C你想得比我们都远。\u201D`, d:'P', s:1 },
+      { t:`\u201C交给你我就放心了。\u201D`, d:'P', s:2, sub:'统筹' },
+      { t:`\u201C这个做得真好看。\u201D`, d:'X', s:2, sub:'视觉' }
+    ]},
+  { p:`同样是熬夜，哪一种你不觉得亏？`,
+    o:[
+      { t:`把一份东西反复改，把漏洞一个个堵上`, d:'P', s:2, sub:'策划' },
+      { t:`对着屏幕挪素材、调颜色、试字体`, d:'X', s:2, sub:'视觉' },
+      { t:`在群里一个个催、一个个确认，把人都对上`, d:'Z', s:2, sub:'带队' }
+    ]},
+  { p:`一个新点子，你的第一反应更接近？`,
+    o:[
+      { t:`先想它卡在哪，卡不死就干`, d:'P', s:2, sub:'策划' },
+      { t:`先给它想个名字，还有它长什么样`, d:'X', s:2, sub:'文字' },
+      { t:`先兴奋一阵，然后不知道从哪下手`, d:'X', s:1 },
+      { t:`先找两个人问问，他们愿不愿意来`, d:'Z', s:2, sub:'带队' }
+    ]},
+  { p:`给你三个月，你更愿意练成哪样？`,
+    o:[
+      { t:`拍出来、剪出来的东西，一眼就是好看`, d:'X', s:2, sub:'影像' },
+      { t:`再难开口的人，你也能聊上`, d:'Z', s:2, sub:'带队' },
+      { t:`再乱的一摊事，你都能给它排出个先后`, d:'P', s:2, sub:'统筹' }
+    ]},
+  { p:`要重复很多遍的活，什么能让你不烦？`,
+    o:[
+      { t:`有人在旁边一起干，还聊得挺开心`, d:'Z', s:2, sub:'陪伴' },
+      { t:`能看出来它比上一遍好了一点`, d:'X', s:2, sub:'视觉' },
+      { t:`知道这一遍做完，后面的人就不用再做了`, d:'P', s:2, sub:'策划' }
+    ]},
+
+  // PART 4：25-30
+  { p:`一整天热闹的聚会散场，你？`,
+    o:[
+      { t:`脑子里在过今天哪儿没安排好`, d:'P', s:2, sub:'统筹' },
+      { t:`累，但被需要的感觉挺好`, d:'Z', s:1 },
+      { t:`先安静半天，谁也别找我`, d:'X', s:2, sub:'文字' },
+      { t:`还挺兴奋，想再找人说会儿话`, d:'Z', s:2, sub:'陪伴' }
+    ]},
+  { p:`你觉得多数事情办砸，是因为？`,
+    o:[
+      { t:`看着热闹，其实没人真的在意结果`, d:'X', s:1 },
+      { t:`一开始就没想明白，往后每一步都在补`, d:'P', s:2, sub:'策划' },
+      { t:`该说清的没说清，信息传歪了`, d:'X', s:2, sub:'文字' },
+      { t:`到了现场没人真的兜住，出事就散了`, d:'Z', s:2, sub:'带队' }
+    ]},
+  { p:`如果只能保住一样，你选？`,
+    o:[
+      { t:`参与的人这一趟没白来`, d:'Z', s:2, sub:'陪伴' },
+      { t:`留下的东西是好看的、拿得出手的`, d:'X', s:2, sub:'视觉' },
+      { t:`这套办法留下来了，下一届能接着用`, d:'P', s:2, sub:'策划' }
+    ]},
+  { p:`被人挑毛病，哪种最让你难受？`,
+    o:[
+      { t:`\u201C做得挺糙。\u201D`, d:'X', s:2, sub:'视觉' },
+      { t:`\u201C考虑得不周全。\u201D`, d:'P', s:2, sub:'策划' },
+      { t:`\u201C又慢了。\u201D`, d:'P', s:1 },
+      { t:`\u201C有点不顾别人感受。\u201D`, d:'Z', s:2, sub:'陪伴' }
+    ]},
+  { p:`下面哪件事，你会主动举手？`,
+    o:[
+      { t:`三样都还行，看谁缺人`, d:'',  s:0 },
+      { t:`有一群新人第一天来，没人带`, d:'Z', s:2, sub:'带队' },
+      { t:`有一段东西要写，还得写得让人愿意看完`, d:'X', s:2, sub:'文字' },
+      { t:`有一堆乱账要盘清楚，还得排出个顺序`, d:'P', s:2, sub:'统筹' }
+    ]},
+  { p:`你希望别人提到你时说的是？`,
+    o:[
+      { t:`\u201C他做的东西，我记住了。\u201D`, d:'X', s:2, sub:'影像' },
+      { t:`\u201C他把这事想通了。\u201D`, d:'P', s:2, sub:'策划' },
+      { t:`\u201C他在，事情就不会散。\u201D`, d:'Z', s:2, sub:'带队' }
+    ]}
+];
+
+/* 部门元数据 */
+const DEPTS = {
+  P: { name:'项目部',   subMap:{ '统筹':'统筹向', '策划':'策划向' } },
+  X: { name:'宣传部',   subMap:{ '视觉':'视觉向', '文字':'文字向', '影像':'影像向' } },
+  Z: { name:'志愿者部', subMap:{ '带队':'带队向', '陪伴':'陪伴向' } }
+};
+const DEPT_KEYS = ['P','X','Z'];
+
+/* 部分名 */
+const PART_NAMES = ['你平时的样子','事情来了','你耐得住什么','你怎么看自己'];
+function partOf(idx){ return idx < 8 ? 0 : idx < 17 ? 1 : idx < 24 ? 2 : 3; }
+
+/* 部门文案 */
+const DEPT_DESC = {
+  P: '你习惯把事情想在前头——结构、时间、风险、交接，都在你脑子里排过一遍再动手。你是那种「先看清楚整张地图再出发」的人，适合把零散的需求收拢成一份可执行的方案。',
+  X: '你对「怎么呈现」很敏感——一句话怎么写得让人愿意看完，一帧画面怎么调才舒服，一个片段怎么剪才打动人。你在乎的不是有没有说，而是说得够不够好。',
+  Z: '你在意的是「人」——在场的人需要什么，没在场的人会不会被落下，事情散了的时候有没有人兜住。你的强项不是单点输出，而是让一屋子人觉得稳。'
+};
+const SUB_DESC = {
+  '统筹':'在你身上，「把事情排清楚」的本能比「想出新点子」更强。',
+  '策划':'在你身上，「想清楚下一步该怎么做」的本能比「把表排好」更强。',
+  '视觉':'你更在意外观——颜色、字体、排版是不是到位，这些事你比大多数人敏感。',
+  '文字':'你更擅长用字把事情讲明白，一句长话能不能让人看进去，是你最先琢磨的事。',
+  '影像':'你对画面和节奏的敏感度最高，镜头语言是你的母语。',
+  '带队':'你是那种能把一屋子人拢在一起、让事情不散的人。',
+  '陪伴':'你更在意的是让身边的人感到被接住，胜过把事情往前推。'
+};
+const DISCLAIMER = '※ 本结果仅供自我了解与参考，不作为面试评判依据。';
+const TIE_TWO   = '你身上同时带着 {A} 和 {B} 的影子，两边都能站得住——面试时可以把两边都聊一聊。';
+const TIE_THREE = '三项都挺接近，没有哪个明显占头——你的兴趣比单选宽。';
+
+/* ============================================================
+   状态与渲染
+============================================================ */
+const $quiz = document.getElementById('quiz');
+const $prog = document.getElementById('progBar');
+const $prev = document.getElementById('prevBtn');
+const $next = document.getElementById('nextBtn');
+const $result = document.getElementById('resultWrap');
+const $progressWrap = document.getElementById('progress');
+const $cardSub = document.getElementById('cardSub');
+const $nav = document.getElementById('nav');
+
+let cur = 0;
+const answers = new Array(QUESTIONS.length).fill(null);
+
+function init(){
+  // 一次性渲染所有题目（一页一题，用 active 切换）
+  QUESTIONS.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'q' + (qi === 0 ? ' active' : '');
+    div.dataset.idx = qi;
+    const letters = q.o.map((op, oi) => {
+      const letter = String.fromCharCode(65 + oi);
+      return `<button class="opt" data-oi="${oi}">
+        <span class="opt-letter">${letter}</span>
+        <span class="opt-text">${escapeHtml(op.t)}</span>
+        <span class="opt-check"></span>
+      </button>`;
+    }).join('');
+    div.innerHTML = `
+      <div class="q-meta">
+        <span class="q-part">PART ${partOf(qi)+1} · ${PART_NAMES[partOf(qi)]}</span>
+        <span class="q-count">第 ${qi+1} / ${QUESTIONS.length} 题</span>
+      </div>
+      <div class="q-title">${escapeHtml(q.p)}</div>
+      <div class="opts">${letters}</div>
+    `;
+    $quiz.appendChild(div);
+  });
+
+  // 绑定选项点击
+  document.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const qDiv = btn.closest('.q');
+      const qi = +qDiv.dataset.idx;
+      pick(qi, +btn.dataset.oi);
+    });
+  });
+
+  $prev.addEventListener('click', prev);
+  $next.addEventListener('click', next);
+  render();
+}
+
+function pick(qi, oi){
+  answers[qi] = oi;
+  const qDiv = $quiz.querySelector(`.q[data-idx="${qi}"]`);
+  qDiv.querySelectorAll('.opt').forEach((b, idx) => b.classList.toggle('sel', idx === oi));
+  $next.disabled = false;
+  $next.textContent = qi === QUESTIONS.length - 1 ? '查看结果' : '下一题';
+  updateProgress();
+}
+
+function render(){
+  document.querySelectorAll('.q').forEach(d => d.classList.remove('active'));
+  $quiz.querySelector(`.q[data-idx="${cur}"]`).classList.add('active');
+  // 恢复当前题已选状态
+  const qDiv = $quiz.querySelector(`.q[data-idx="${cur}"]`);
+  qDiv.querySelectorAll('.opt').forEach((b, idx) => b.classList.toggle('sel', idx === answers[cur]));
+  // 上一题按钮
+  $prev.classList.toggle('invisible', cur === 0);
+  // 下一题按钮
+  $next.disabled = answers[cur] === null;
+  $next.textContent = cur === QUESTIONS.length - 1 ? '查看结果' : '下一题';
+  updateProgress();
+}
+
+function updateProgress(){
+  const done = answers.filter(a => a !== null).length;
+  $prog.style.width = (done / QUESTIONS.length * 100) + '%';
+}
+
+function prev(){ if (cur > 0){ cur--; render(); } }
+function next(){
+  if (answers[cur] === null) return;
+  if (cur < QUESTIONS.length - 1){ cur++; render(); }
+  else showResult();
+}
+
+/* ============================================================
+   计分与结果
+============================================================ */
+function computeResult(){
+  const raw = {P:0, X:0, Z:0};
+  const subScore = {P:{}, X:{}, Z:{}};
+  for (let i=0; i<QUESTIONS.length; i++){
+    const oi = answers[i];
+    if (oi === null) continue;
+    const op = QUESTIONS[i].o[oi];
+    if (!op || !op.d) continue;
+    raw[op.d] += op.s;
+    if (op.sub && op.s > 0){
+      subScore[op.d][op.sub] = (subScore[op.d][op.sub] || 0) + op.s;
+    }
+  }
+  const total = raw.P + raw.X + raw.Z;
+  const pct = {
+    P: total ? +(raw.P / total * 100).toFixed(1) : 0,
+    X: total ? +(raw.X / total * 100).toFixed(1) : 0,
+    Z: total ? +(raw.Z / total * 100).toFixed(1) : 0
+  };
+  const sorted = DEPT_KEYS.slice().sort((a,b) => pct[b] - pct[a]);
+  const top1 = sorted[0], top2 = sorted[1], top3 = sorted[2];
+  let topSub = null, topSubVal = -1;
+  for (const k in subScore[top1]){
+    if (subScore[top1][k] > topSubVal){ topSubVal = subScore[top1][k]; topSub = k; }
+  }
+  const diff12 = +(pct[top1] - pct[top2]).toFixed(1);
+  const range  = +(pct[top1] - pct[top3]).toFixed(1);
+  let tieKind = null;
+  if (range <= 3) tieKind = 'three';
+  else if (diff12 <= 3) tieKind = 'two';
+  return { raw, pct, total, top1, top2, top3, topSub, tieKind };
+}
+
+function showResult(){
+  const r = computeResult();
+  const order = DEPT_KEYS.slice().sort((a,b) => r.pct[b] - r.pct[a]);
+
+  let cards = '';
+  order.forEach((dk, idx) => {
+    const isTop = (idx === 0);
+    const name  = DEPTS[dk].name;
+    const color = {P:'#3a6db8',X:'#c54a6a',Z:'#2f9d6e'}[dk];
+    const pct   = r.pct[dk];
+    const raw   = r.raw[dk];
+    cards += `
+      <div class="result-card ${isTop ? 'rc-top' : ''}">
+        ${isTop ? '<div class="crown">本命部门</div>' : ''}
+        <div class="rc-row">
+          <div class="rc-name" style="color:${isTop?color:'inherit'}">${name}</div>
+          ${isTop && r.topSub ? `<div class="rc-sub">偏 ${DEPTS[dk].subMap[r.topSub] || r.topSub}</div>` : ''}
+          <div class="rc-score" style="color:${isTop?color:'#1f1d18'}">${pct.toFixed(1)}<span style="font-size:16px;color:#8a8275;font-weight:600">%</span></div>
+        </div>
+        <div class="rc-raw">原始分 ${raw} / 60</div>
+        <div class="rc-bar"><div class="rc-bar-fill d${dk}" data-pct="${pct}"></div></div>
+        ${isTop ? `
+          <div class="rc-desc">${DEPT_DESC[dk]}</div>
+          ${r.topSub && SUB_DESC[r.topSub] ? `<div class="rc-subattr">${SUB_DESC[r.topSub]}</div>` : ''}
+        ` : ''}
+      </div>
+    `;
+  });
+
+  let extra = '';
+  if (r.tieKind === 'three'){
+    extra = `<div class="rc-three">${TIE_THREE}</div>`;
+  } else if (r.tieKind === 'two'){
+    extra = `<div class="rc-tie">${TIE_TWO.replace('{A}', DEPTS[r.top1].name).replace('{B}', DEPTS[r.top2].name)}</div>`;
+  }
+
+  const q31 = `
+    <div class="rc-q31">
+      <label>选填 · 你现在最想去哪个部门 <span class="opt-tag">不计入结果</span></label>
+      <select id="q31">
+        <option value="">暂未决定 / 留空</option>
+        <option value="P">项目部</option>
+        <option value="X">宣传部</option>
+        <option value="Z">志愿者部</option>
+      </select>
+    </div>
+  `;
+  const actions = `
+    <div class="rc-actions">
+      <button class="rc-btn rc-btn-primary" id="copyBtn">复制结果</button>
+      <button class="rc-btn rc-btn-ghost" id="restartBtn">重新作答</button>
+    </div>
+  `;
+
+  $result.innerHTML = `
+    <div class="result-head"><h2>你的部门适配度</h2><p class="tip">基于你的 ${QUESTIONS.length} 道答题分析如下</p></div>
+    ${cards}${extra}<div class="rc-disc">${DISCLAIMER}</div>${q31}${actions}
+  `;
+
+  // 隐藏题目区与导航
+  $quiz.style.display = 'none';
+  $nav.style.display = 'none';
+  $progressWrap.style.display = 'none';
+  $cardSub.style.display = 'none';
+
+  // 动画
+  requestAnimationFrame(() => {
+    $result.querySelectorAll('.rc-bar-fill').forEach(el => {
+      el.style.width = (+el.dataset.pct) + '%';
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', copyResult);
+  document.getElementById('restartBtn').addEventListener('click', restart);
+}
+
+/* ============================================================
+   复制结果
+============================================================ */
+function buildCopyText(){
+  const r = computeResult();
+  const order = DEPT_KEYS.slice().sort((a,b) => r.pct[b] - r.pct[a]);
+  const top = r.top1;
+  const topName = DEPTS[top].name;
+  const topSubLabel = r.topSub ? DEPTS[top].subMap[r.topSub] : '';
+  const lines = [];
+  lines.push('本命部门测试 · 我的结果');
+  lines.push('');
+  lines.push('★ 本命部门：' + topName + (topSubLabel ? '（' + topSubLabel + '）' : ''));
+  lines.push('');
+  lines.push('—— 适配度 ——');
+  order.forEach(dk => {
+    lines.push(`${DEPTS[dk].name}　${r.pct[dk].toFixed(1)}% (${r.raw[dk]}/60)　${makeBar(r.pct[dk])}`);
+  });
+  lines.push('');
+  lines.push('—— 推荐方向 ——');
+  lines.push(DEPT_DESC[top]);
+  if (r.topSub && SUB_DESC[r.topSub]) lines.push(SUB_DESC[r.topSub]);
+  if (r.tieKind === 'three')      lines.push(TIE_THREE);
+  else if (r.tieKind === 'two')   lines.push(TIE_TWO.replace('{A}', DEPTS[r.top1].name).replace('{B}', DEPTS[r.top2].name));
+  lines.push('');
+  const q31 = document.getElementById('q31');
+  if (q31 && q31.value){
+    lines.push('—— 选填 ——');
+    lines.push('我现在最想去的部门：' + DEPTS[q31.value].name);
+    lines.push('');
+  }
+  const d = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  lines.push('时间：' + d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()));
+  lines.push('');
+  lines.push(DISCLAIMER);
+  return lines.join('\n');
+}
+
+function makeBar(pct){
+  const total = 20;
+  const filled = Math.max(0, Math.min(total, Math.round(pct / 100 * total)));
+  return '■'.repeat(filled) + '□'.repeat(total - filled);
+}
+
+function copyResult(){
+  const text = buildCopyText();
+  const done = () => showToast('已复制，可粘贴发给 HR');
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(fallbackCopy);
+  } else { fallbackCopy(); }
+  function fallbackCopy(){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);
+      ta.focus();ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (ok) done(); else showToast('复制失败，请长按选择文本');
+    }catch(e){ showToast('复制失败，请长按选择文本'); }
+  }
+}
+
+/* ============================================================
+   重新作答
+============================================================ */
+function restart(){
+  for (let i=0; i<answers.length; i++) answers[i] = null;
+  cur = 0;
+  $result.innerHTML = '';
+  $quiz.style.display = '';
+  $nav.style.display = '';
+  $progressWrap.style.display = '';
+  $cardSub.style.display = '';
+  document.querySelectorAll('.opt').forEach(b => b.classList.remove('sel'));
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ============================================================
+   toast
+============================================================ */
+let toastTimer = null;
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>
