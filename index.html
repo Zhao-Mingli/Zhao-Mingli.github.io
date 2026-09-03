@@ -732,6 +732,8 @@ function buildCopyText(){
   const pad = n => String(n).padStart(2,'0');
   lines.push('时间：' + d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()));
   lines.push('');
+  lines.push('想测测自己匹配哪个部门？点击链接：https://zhao-mingli.github.io/');
+  lines.push('');
   lines.push(DISCLAIMER);
   return lines.join('\n');
 }
@@ -744,7 +746,7 @@ function makeBar(pct){
 
 function copyResult(){
   const text = buildCopyText();
-  const done = () => showToast('已复制，可粘贴发给 HR');
+  const done = () => showToast('已复制，可粘贴发给朋友');
   if (navigator.clipboard && window.isSecureContext){
     navigator.clipboard.writeText(text).then(done).catch(fallbackCopy);
   } else { fallbackCopy(); }
