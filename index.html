@@ -167,7 +167,10 @@
   .rc-bar-fill.dP{background:linear-gradient(90deg,#3a6db8 0%,#5a8ad0 100%)}
   .rc-bar-fill.dX{background:linear-gradient(90deg,#c54a6a 0%,#dd7090 100%)}
   .rc-bar-fill.dZ{background:linear-gradient(90deg,#2f9d6e 0%,#4cb88c 100%)}
-  .rc-desc{margin-top:16px;padding-top:14px;border-top:1px dashed rgba(0,0,0,.08);font-size:15px;line-height:1.8;color:#3a3530}
+  .advice-block{margin:14px 0;background:#fff;border-radius:16px;padding:18px 18px;border:1px solid rgba(0,0,0,.04);box-shadow:0 1px 0 rgba(0,0,0,.02),0 8px 24px -12px rgba(0,0,0,.08)}
+  .advice-title{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;letter-spacing:.15em;color:#8a6f3d;margin-bottom:12px}
+  .advice-title::before{content:"";width:7px;height:7px;border-radius:2px;background:#c89a3a;transform:rotate(45deg)}
+  .advice-desc{font-size:15px;line-height:1.8;color:#3a3530}
   .rc-subattr{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:rgba(0,0,0,.025);padding:10px 12px;border-radius:8px;border-left:3px solid #c89a3a}
   .rc-tie{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:#f4f0ff;padding:10px 12px;border-radius:8px;border-left:3px solid #8a7fc8}
   .rc-three{margin-top:10px;font-size:14px;color:#5a5448;line-height:1.7;background:#f0f6ff;padding:10px 12px;border-radius:8px;border-left:3px solid #6f9ed4}
@@ -641,20 +644,25 @@ function showResult(){
         </div>
         <div class="rc-raw">原始分 ${raw} / 60</div>
         <div class="rc-bar"><div class="rc-bar-fill d${dk}" data-pct="${pct}"></div></div>
-        ${isTop ? `
-          <div class="rc-desc">${DEPT_DESC[dk]}</div>
-          ${r.topSub && SUB_DESC[r.topSub] ? `<div class="rc-subattr">${SUB_DESC[r.topSub]}</div>` : ''}
-        ` : ''}
       </div>
     `;
   });
 
-  let extra = '';
+  // 推荐方向区块（部门文案 + 副属性 + 平局提示）
+  let tie = '';
   if (r.tieKind === 'three'){
-    extra = `<div class="rc-three">${TIE_THREE}</div>`;
+    tie = `<div class="rc-three">${TIE_THREE}</div>`;
   } else if (r.tieKind === 'two'){
-    extra = `<div class="rc-tie">${TIE_TWO.replace('{A}', DEPTS[r.top1].name).replace('{B}', DEPTS[r.top2].name)}</div>`;
+    tie = `<div class="rc-tie">${TIE_TWO.replace('{A}', DEPTS[r.top1].name).replace('{B}', DEPTS[r.top2].name)}</div>`;
   }
+  const advice = `
+    <div class="advice-block">
+      <div class="advice-title">推荐方向</div>
+      <div class="advice-desc">${DEPT_DESC[r.top1]}</div>
+      ${r.topSub && SUB_DESC[r.topSub] ? `<div class="rc-subattr">${SUB_DESC[r.topSub]}</div>` : ''}
+      ${tie}
+    </div>
+  `;
 
   const q31 = `
     <div class="rc-q31">
@@ -676,7 +684,7 @@ function showResult(){
 
   $result.innerHTML = `
     <div class="result-head"><h2>你的部门适配度</h2><p class="tip">基于你的 ${QUESTIONS.length} 道答题分析如下</p></div>
-    ${cards}${extra}<div class="rc-disc">${DISCLAIMER}</div>${q31}${actions}
+    ${cards}${advice}<div class="rc-disc">${DISCLAIMER}</div>${q31}${actions}
   `;
 
   // 隐藏题目区与导航
